@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RoboScript - Resultado</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" th:href="@{/css/arbol.css}">
+</head>
+<body>
+<header th:replace="~{fragments :: encabezado}"></header>
+
+<main class="contenedor" th:with="r=${resultado}">
+
+    <!-- ===== Resultado general ===== -->
+    <div th:class="${r.valido} ? 'banner banner-ok' : 'banner banner-error'">
+        <div>
+            <div class="banner-titulo" th:text="${r.valido} ? '✓ ARCHIVO VÁLIDO' : '✗ ARCHIVO NO VÁLIDO'">✓ ARCHIVO VÁLIDO</div>
+            <div class="banner-archivo" th:text="${r.nombreArchivo}">recorrido.robot</div>
+        </div>
+    </div>
+
+    <!-- ===== Indicadores ===== -->
+    <div class="indicadores">
+        <div class="indicador">
+            <span class="indicador-valor" th:text="${#lists.size(r.tokens)}">32</span>
+            <span class="indicador-texto">Tokens reconocidos</span>
+        </div>
+        <div class="indicador">
+            <span class="indicador-valor" th:text="${r.resumen.instrucciones}">13</span>
+            <span class="indicador-texto">Instrucciones</span>
+        </div>
+        <div th:class="${#lists.isEmpty(r.erroresLexicos)} ? 'indicador' : 'indicador indicador-error'">
+            <span class="indicador-valor" th:text="${#lists.size(r.erroresLexicos)}">0</span>
+            <span class="indicador-texto">Errores léxicos</span>
+        </div>
+        <div th:class="${#lists.isEmpty(r.erroresSintacticos)} ? 'indicador' : 'indicador indicador-error'">
+            <span class="indicador-valor" th:text="${#lists.size(r.erroresSintacticos)}">0</span>
+            <span class="indicador-texto">Errores sintácticos</span>
+        </div>
+    </div>
+
+    <!-- ===== Errores ===== -->
+    <section class="tarjeta" th:unless="${r.valido}">
+        <h2>Errores encontrados</h2>
+        <table class="tabla">
+            <thead>
+            <tr><th>Tipo</th><th>Línea</th><th>Columna</th><th>Descripción</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="e : ${r.erroresLexicos}">
+                <td><span class="etiqueta etiqueta-lexico">LÉXICO</span></td>
+                <td th:text="${e.linea()}">1</td>
+                <td th:text="${e.columna()}">7</td>
+                <td th:text="${e.mensaje()}">12ROB no cumple con la expresión regular de CODIGO_ROBOT</td>
+            </tr>
+            <tr th:each="e : ${r.erroresSintacticos}">
+                <td><span class="etiqueta etiqueta-sintactico">SINTÁCTICO</span></td>
+                <td th:text="${e.linea()}">4</td>
+                <td th:text="${e.columna()}">1</td>
+                <td th:text="${e.mensaje()}">Se esperaba NUMERO después de AVANZAR.</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <div class="dos-columnas">
+        <!-- ===== Código fuente ===== -->
+        <section class="tarjeta">
+            <h2>Código analizado</h2>
+            <div th:replace="~{fragments :: codigo}"></div>
+        </section>
+
+        <!-- ===== Resumen del programa ===== -->
+        <section class="tarjeta">
+            <h2>Resumen del programa</h2>
+            <dl class="resumen">
+                <dt>Robot</dt>              <dd th:text="${r.resumen.robot}">123ROB</dd>
+                <dt>Posición inicial</dt>   <dd th:text="${r.resumen.posicionInicial}">X10,Y05</dd>
+                <dt>Movimientos</dt>        <dd th:text="${r.resumen.movimientos}">5</dd>
+                <dt>Giros</dt>              <dd th:text="${r.resumen.giros}">3</dd>
+                <dt>Objetos levantados</dt> <dd th:text="${r.resumen.objetosLevantados}">1</dd>
+                <dt>Objetos soltados</dt>   <dd th:text="${r.resumen.objetosSoltados}">1</dd>
+                <dt>Bloques SI</dt>         <dd th:text="${r.resumen.bloquesSi}">1</dd>
+                <dt>Bloques REPETIR</dt>    <dd th:text="${r.resumen.bloquesRepetir}">1</dd>
+            </dl>
+        </section>
+    </div>
+
+    <!-- ===== Árbol sintáctico ===== -->
+    <section class="tarjeta">
+        <h2>Árbol sintáctico</h2>
+        <div class="arbol-barra">
+            <span class="arbol-datos"
+                  th:text="${r.arbol.contarNodos()} + ' nodos · ' + ${r.arbol.altura()} + ' niveles · raíz: programa'">67 nodos</span>
+            <div class="arbol-botones">
+                <button type="button" class="boton boton-secundario" id="arbol-menos" title="Alejar">−</button>
+                <span id="arbol-zoom">100%</span>
+                <button type="button" class="boton boton-secundario" id="arbol-mas" title="Acercar">+</button>
+                <button type="button" class="boton boton-secundario" id="arbol-ajustar">Ajustar</button>
+                <button type="button" class="boton boton-secundario" id="arbol-real">Tamaño real</button>
+                <button type="button" class="boton" id="arbol-png">Descargar PNG</button>
+            </div>
+        </div>
+        <div class="arbol-lienzo" id="arbol-lienzo">
+            <svg id="arbol-svg" role="img" aria-label="Árbol sintáctico del archivo analizado"></svg>
+        </div>
+        <p class="arbol-leyenda">
+            <span><i class="ley-regla"></i> Regla (no terminal)</span>
+            <span><i class="ley-token"></i> Token (terminal) con su lexema</span>
+            <span><i class="ley-lexico"></i> Token con error léxico</span>
+            <span><i class="ley-error"></i> Error sintáctico (falta / inesperado)</span>
+            <span><i class="ley-vacio"></i> ε (bloque vacío)</span>
+        </p>
+    </section>
+
+    <!-- ===== Tabla de tokens ===== -->
+    <section class="tarjeta">
+        <h2>Tabla de tokens</h2>
+        <div class="tabla-scroll">
+            <table class="tabla">
+                <thead>
+                <tr><th>#</th><th>Lexema</th><th>Token</th><th>Línea</th><th>Columna</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="t, i : ${r.tokens}">
+                    <td th:text="${i.count}">1</td>
+                    <td><code th:text="${t.lexema()}">ROBOT</code></td>
+                    <td th:text="${t.token()}">ROBOT</td>
+                    <td th:text="${t.linea()}">1</td>
+                    <td th:text="${t.columna()}">1</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ===== Reporte en formato del enunciado ===== -->
+    <section class="tarjeta">
+        <h2>Reporte</h2>
+        <pre class="reporte" th:text="${r.reporte}">=====</pre>
+    </section>
+
+    <div class="acciones">
+        <a th:href="@{/}" class="boton">Nuevo análisis</a>
+        <a th:href="@{/historial}" class="boton boton-secundario">Ver historial</a>
+    </div>
+</main>
+
+<footer th:replace="~{fragments :: pie}"></footer>
+
+<script th:inline="javascript">
+    window.ARBOL = /*[(${resultado.arbol.toJson()})]*/ null;
+    window.ARBOL_NOMBRE = /*[[${resultado.nombreArchivo}]]*/ 'arbol';
+</script>
+<script th:src="@{/js/arbol.js}"></script>
+</body>
+</html>

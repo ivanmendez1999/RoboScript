@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RoboScript - Gramática LL(1)</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" th:href="@{/css/teoria.css}">
+</head>
+<body>
+<header th:replace="~{fragments :: encabezado}"></header>
+
+<main class="contenedor">
+    <h1>Gramática de RoboScript</h1>
+    <p class="subtitulo">Gramática libre de contexto en BNF, conjuntos FIRST y FOLLOW, tabla de análisis LL(1) y análisis predictivo con pila.</p>
+
+    <div th:class="${g.esLL1()} ? 'alerta alerta-ok' : 'alerta alerta-error'">
+        <span th:if="${g.esLL1()}">✓ La gramática es LL(1): ninguna celda de la tabla tiene más de una producción, así que se puede analizar de izquierda a derecha viendo un solo token.</span>
+        <span th:unless="${g.esLL1()}" th:text="${'La gramática NO es LL(1): ' + g.conflictos}">Conflictos</span>
+    </div>
+
+    <div class="dos-columnas">
+        <!-- BNF -->
+        <section class="tarjeta">
+            <h2>Gramática en BNF</h2>
+            <p class="nota">No terminales en minúscula · <strong>TERMINALES</strong> (tokens) en mayúscula · ε = cadena vacía · Símbolo inicial: <code th:text="${g.inicial}">programa</code></p>
+            <table class="tabla bnf">
+                <tbody>
+                <tr th:each="entrada : ${g.bnf}">
+                    <td class="bnf-izq" th:text="${entrada.key}">programa</td>
+                    <td class="bnf-op">::=</td>
+                    <td class="bnf-der" th:text="${entrada.value}">declaracion posicion lista</td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Producciones numeradas -->
+        <section class="tarjeta">
+            <h2>Producciones numeradas</h2>
+            <p class="nota">El número se usa en la tabla LL(1) y en la traza del análisis.</p>
+            <div class="tabla-scroll">
+                <table class="tabla">
+                    <thead><tr><th>#</th><th>Producción</th></tr></thead>
+                    <tbody>
+                    <tr th:each="p : ${g.producciones}">
+                        <td th:text="${p.numero()}">1</td>
+                        <td><code th:text="${p.toString()}">programa → declaracion posicion lista</code></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- FIRST y FOLLOW -->
+    <section class="tarjeta">
+        <h2>Conjuntos FIRST y FOLLOW</h2>
+        <div class="tabla-scroll">
+            <table class="tabla">
+                <thead><tr><th>No terminal</th><th>FIRST</th><th>FOLLOW</th></tr></thead>
+                <tbody>
+                <tr th:each="nt : ${g.noTerminales}">
+                    <td><strong th:text="${nt}">programa</strong></td>
+                    <td><code th:text="${g.firstTexto(nt)}">{ ROBOT }</code></td>
+                    <td><code th:text="${g.followTexto(nt)}">{ $ }</code></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="nota">FIRST(A): tokens con los que puede empezar A. FOLLOW(A): tokens que pueden aparecer justo después de A ($ = fin de archivo).</p>
+    </section>
+
+    <!-- Tabla LL(1) -->
+    <section class="tarjeta">
+        <h2>Tabla de análisis LL(1)</h2>
+        <p class="nota">Cada celda [no terminal, token] indica qué producción aplicar. Celda vacía = error sintáctico. Pase el cursor sobre un número para ver la producción.</p>
+        <div class="tabla-scroll tabla-ll1-scroll">
+            <table class="tabla tabla-ll1">
+                <thead>
+                <tr>
+                    <th class="fija"></th>
+                    <th th:each="t : ${g.columnasTabla}"><span class="vertical" th:text="${t}">ROBOT</span></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="nt : ${g.noTerminales}">
+                    <th class="fija" th:text="${nt}">programa</th>
+                    <td th:each="t : ${g.columnasTabla}" th:with="pr=${g.getCelda(nt, t)}"
+                        th:classappend="${pr != null} ? 'con-prod'"
+                        th:title="${pr != null} ? ${pr.toString()} : ''"
+                        th:text="${pr != null} ? ${pr.numero()} : ''">1</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Analizador LL(1) -->
+    <section class="tarjeta">
+        <h2>Análisis LL(1) paso a paso</h2>
+        <p class="nota">El código se convierte en tokens con el lexer de ANTLR y luego se analiza con la tabla y una pila. Este analizador se detiene en el primer error (el analizador principal de la aplicación sí se recupera y reporta todos).</p>
+
+        <form th:action="@{/gramatica}" method="post">
+            <textarea name="codigo" rows="9" spellcheck="false" th:text="${codigo}">ROBOT 123ROB</textarea>
+            <div class="acciones">
+                <button type="submit" class="boton">Analizar con LL(1)</button>
+            </div>
+        </form>
+
+        <div th:if="${ll1}" class="mt">
+            <div th:class="${ll1.aceptada()} ? 'alerta alerta-ok' : 'alerta alerta-error'" th:text="${ll1.mensaje()}">Resultado</div>
+            <div class="alerta alerta-aviso" th:if="${ll1.erroresLexicos() > 0}"
+                 th:text="${'Atención: el código tiene ' + ll1.erroresLexicos() + ' error(es) léxico(s). Revíselo en la página de análisis.'}">Aviso</div>
+
+            <p class="ejemplos-titulo">Secuencia de tokens (entrada):</p>
+            <div class="chips">
+                <span class="chip" th:each="t : ${ll1.tokens()}" th:text="${t}">ROBOT</span>
+                <span class="chip">$</span>
+            </div>
+
+            <div class="tabla-scroll mt">
+                <table class="tabla tabla-traza">
+                    <thead><tr><th>#</th><th>Pila (tope a la izquierda)</th><th>Entrada</th><th>Acción</th></tr></thead>
+                    <tbody>
+                    <tr th:each="p : ${ll1.pasos()}" th:classappend="${p.error()} ? 'fila-error'">
+                        <td th:text="${p.numero()}">1</td>
+                        <td><code th:text="${p.pila()}">programa $</code></td>
+                        <td><code th:text="${p.entrada()}">ROBOT CODIGO_ROBOT … $</code></td>
+                        <td th:text="${p.accion()}">(1) programa → declaracion posicion lista</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{fragments :: pie}"></footer>
+</body>
+</html>

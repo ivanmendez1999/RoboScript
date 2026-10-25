@@ -1,0 +1,1798 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset=utf8>
+  <meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <style>
+    :root {
+      color-scheme: light;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px)
+    }
+
+    html {
+      scroll-padding-top: env(safe-area-inset-top, 0px)
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font: 14px -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #fff;
+      color: #000
+    }
+
+    img {
+      max-width: 100%
+    }
+
+    [hidden]:not([hidden=until-found i]) {
+      display: none !important
+    }
+  </style>
+</head>
+
+<body>
+  <title>RoboScript Keynote</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+  <style>
+    /* Diseño: keynote a pantalla completa. Cada diapositiva es una foto con velo oscuro,
+   título grande en blanco y tarjetas de vidrio esmerilado. Una sola apariencia oscura, elegida a propósito. */
+    :root {
+      --fondo: #08090b;
+      --texto: #f5f5f7;
+      --suave: #a9aab2;
+      --naranja: #ff9f0a;
+      --celeste: #5ac8fa;
+      --verde: #30d158;
+      --rojo: #ff453a;
+      --vidrio: rgba(255, 255, 255, 0.08);
+      --vidrio-borde: rgba(255, 255, 255, 0.22);
+      --linea: rgba(255, 255, 255, 0.14);
+      --display: "Manrope", "Helvetica Neue", Arial, sans-serif;
+      --cuerpo: "Manrope", "Helvetica Neue", Arial, sans-serif;
+      --mono: "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+      color-scheme: dark;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+      background: var(--fondo);
+    }
+
+    body {
+      background: var(--fondo);
+      color: var(--texto);
+      font-family: var(--cuerpo);
+      font-size: 17px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0 0 auto;
+      height: env(safe-area-inset-top, 0px);
+      z-index: 30;
+      background: var(--fondo);
+    }
+
+
+    /* ---------- Barra superior ---------- */
+    .barra {
+      position: fixed;
+      top: env(safe-area-inset-top, 0px);
+      left: 0;
+      right: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-block: 12px;
+      padding-left: max(16px, env(safe-area-inset-left, 0px));
+      padding-right: max(16px, env(safe-area-inset-right, 0px));
+      background: linear-gradient(to bottom, rgba(8, 9, 11, 0.7), rgba(8, 9, 11, 0));
+      pointer-events: none;
+    }
+
+    .barra>* {
+      pointer-events: auto;
+    }
+
+    .marca {
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .marca i {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--naranja);
+      box-shadow: 0 0 12px var(--naranja);
+    }
+
+    .controles {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .contador {
+      font-variant-numeric: tabular-nums;
+      font-size: 13px;
+      color: var(--suave);
+      min-width: 54px;
+      text-align: right;
+    }
+
+    .btn {
+      font: 600 13px var(--cuerpo);
+      color: var(--texto);
+      background: var(--vidrio);
+      border: 1px solid var(--vidrio-borde);
+      border-radius: 999px;
+      padding: 7px 14px;
+      cursor: pointer;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .btn:focus-visible,
+    .punto:focus-visible {
+      outline: 2px solid var(--celeste);
+      outline-offset: 2px;
+    }
+
+    .progreso {
+      position: fixed;
+      left: 0;
+      top: env(safe-area-inset-top, 0px);
+      height: 2px;
+      background: var(--naranja);
+      z-index: 25;
+      width: 0;
+      transition: width 0.3s;
+    }
+
+    .puntos {
+      position: fixed;
+      right: max(14px, env(safe-area-inset-right, 0px));
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .punto {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .punto.activo {
+      background: var(--naranja);
+      transform: scale(1.5);
+    }
+
+    /* ---------- Diapositivas ---------- */
+    .slide {
+      position: relative;
+      min-height: 100svh;
+      scroll-snap-align: start;
+      display: grid;
+      align-items: center;
+      isolation: isolate;
+      overflow: hidden;
+      padding-block: 84px 56px;
+      padding-left: max(16px, env(safe-area-inset-left, 0px));
+      padding-right: max(16px, env(safe-area-inset-right, 0px));
+    }
+
+    .slide::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      background: var(--foto) var(--pos, center) / cover no-repeat;
+      filter: var(--filtro, none);
+      transform: scale(calc(var(--zoom, 1) * var(--kb, 1)));
+    }
+
+    .slide::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: var(--velo, rgba(6, 7, 9, 0.6));
+    }
+
+    .in {
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+      min-width: 0;
+    }
+
+    .ceja {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--celeste);
+      margin: 0 0 10px;
+    }
+
+    h1,
+    h2 {
+      font-family: var(--display);
+      letter-spacing: -0.03em;
+      line-height: 1.04;
+      margin: 0;
+      text-wrap: balance;
+    }
+
+    h2 {
+      font-size: clamp(32px, 4.6vw, 56px);
+      font-weight: 800;
+      margin-bottom: clamp(24px, 4vh, 40px);
+    }
+
+    p {
+      margin: 0;
+    }
+
+    .suave {
+      color: var(--suave);
+    }
+
+    .nota {
+      color: var(--suave);
+      font-size: 15px;
+      margin-top: 22px;
+      max-width: 72ch;
+    }
+
+    code,
+    .mono {
+      font-family: var(--mono);
+    }
+
+    /* Hero */
+    .hero {
+      --velo: linear-gradient(90deg, rgba(6, 7, 9, 0.88) 0%, rgba(6, 7, 9, 0.45) 55%, rgba(6, 7, 9, 0.15) 100%);
+    }
+
+    .hero h1 {
+      font-size: clamp(56px, 10vw, 128px);
+      font-weight: 800;
+    }
+
+    .hero .bajada {
+      font-size: clamp(19px, 2.2vw, 26px);
+      color: #e6e6ea;
+      margin-top: 16px;
+      max-width: 32ch;
+    }
+
+    .num {
+      font-size: clamp(40px, 5vw, 64px);
+      font-weight: 800;
+      color: var(--naranja);
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      margin-bottom: 10px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .num::after {
+      content: "";
+      width: 110px;
+      height: 1.5px;
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .autores {
+      margin-top: clamp(40px, 9vh, 90px);
+    }
+
+    .autores strong {
+      display: block;
+      font-size: 16px;
+    }
+
+    .autores span {
+      color: var(--suave);
+      font-size: 14px;
+    }
+
+    .bajar {
+      margin-top: 28px;
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* Vidrio */
+    .vidrio {
+      background: var(--vidrio);
+      border: 1px solid var(--vidrio-borde);
+      border-radius: 22px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 20px 50px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(24px) saturate(160%);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
+      padding: clamp(18px, 2.2vw, 28px);
+      min-width: 0;
+    }
+
+    .vidrio.rojo {
+      background: rgba(255, 69, 58, 0.12);
+    }
+
+    .rejilla {
+      display: grid;
+      gap: 18px;
+    }
+
+    .c2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .c3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .c5 {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    .dividido {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+      gap: clamp(22px, 3vw, 44px);
+      align-items: center;
+    }
+
+    .dividido.inv {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+    }
+
+    @media (max-width: 900px) {
+
+      .c3,
+      .c5 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .dividido,
+      .dividido.inv {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 560px) {
+
+      .c2,
+      .c3,
+      .c5 {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .puntos {
+        display: none;
+      }
+    }
+
+    .tarjeta-num {
+      font-size: 26px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .tarjeta-tit {
+      font-size: 20px;
+      font-weight: 700;
+      margin-top: 14px;
+    }
+
+    .tarjeta-txt {
+      color: var(--suave);
+      font-size: 14.5px;
+      margin-top: 6px;
+    }
+
+    .icono {
+      width: 34px;
+      height: 34px;
+    }
+
+    pre {
+      margin: 0;
+      font-family: var(--mono);
+      font-size: clamp(12.5px, 1.25vw, 15px);
+      line-height: 1.6;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .pasos-lista {
+      display: grid;
+      gap: 22px;
+    }
+
+    .pasos-lista b {
+      display: block;
+      font-size: clamp(24px, 2.6vw, 32px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .grande {
+      font-size: clamp(48px, 6vw, 76px);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .dato {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 6px 18px;
+      align-items: center;
+    }
+
+    .cifras {
+      display: grid;
+      gap: 26px;
+    }
+
+    .tabla-scroll {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    th {
+      text-align: left;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--suave);
+      font-weight: 700;
+      padding: 10px 12px;
+    }
+
+    td {
+      padding: 11px 12px;
+      border-top: 1px solid var(--linea);
+      white-space: nowrap;
+    }
+
+    td.envolver {
+      white-space: normal;
+    }
+
+    .ok {
+      color: var(--verde);
+      font-weight: 700;
+    }
+
+    .mal {
+      color: var(--rojo);
+      font-weight: 700;
+    }
+
+    .ventana {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 12px;
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5);
+    }
+
+    .superpuestas {
+      position: relative;
+      padding-bottom: 6%;
+    }
+
+    .superpuestas .atras {
+      width: 72%;
+    }
+
+    .superpuestas .frente {
+      width: 66%;
+      position: absolute;
+      right: 0;
+      top: 18%;
+    }
+
+    .diagrama {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 22px;
+      margin-top: 26px;
+    }
+
+    .chips span {
+      font-family: var(--mono);
+      font-weight: 600;
+      font-size: clamp(16px, 1.8vw, 22px);
+      color: var(--rojo);
+    }
+
+    .error-fila {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) auto minmax(0, 1.4fr);
+      gap: 16px;
+      align-items: center;
+      padding: 16px 22px;
+    }
+
+    .error-fila+.error-fila {
+      margin-top: 12px;
+    }
+
+    .error-fila code {
+      color: var(--suave);
+      font-size: 14px;
+    }
+
+    .error-fila .flecha {
+      color: var(--naranja);
+      font-size: 20px;
+    }
+
+    @media (max-width: 700px) {
+      .error-fila {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 6px;
+      }
+
+      .error-fila .flecha {
+        display: none;
+      }
+    }
+
+    .barras {
+      display: grid;
+      gap: 18px;
+    }
+
+    .barra-fila {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr);
+      gap: 14px;
+      align-items: center;
+    }
+
+    .barra-fila span {
+      text-align: right;
+      color: #e6e6ea;
+      font-size: 15px;
+    }
+
+    .barra-pista {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .barra-pista i {
+      display: block;
+      height: 34px;
+      border-radius: 6px;
+      background: var(--verde);
+    }
+
+    .barra-pista b {
+      font-variant-numeric: tabular-nums;
+    }
+
+    @media (max-width: 560px) {
+      .barra-fila {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .barra-fila span {
+        text-align: left;
+      }
+    }
+
+    .creditos {
+      font-size: 12.5px;
+      color: var(--suave);
+      margin-top: 18px;
+      max-width: 90ch;
+    }
+
+    .teclas {
+      font-size: 13px;
+      color: var(--suave);
+      margin-top: 14px;
+    }
+
+    kbd {
+      font-family: var(--mono);
+      font-size: 12px;
+      border: 1px solid var(--vidrio-borde);
+      border-radius: 5px;
+      padding: 1px 6px;
+    }
+
+    /* ---------- Animación ---------- */
+    .num::after {
+      transform: scaleX(var(--l, 1));
+      transform-origin: left;
+    }
+
+    .palabra {
+      display: inline-block;
+      overflow: hidden;
+      vertical-align: bottom;
+      padding-bottom: 0.1em;
+      margin-bottom: -0.1em;
+    }
+
+    .palabra>span {
+      display: inline-block;
+      will-change: transform;
+    }
+
+    .vidrio {
+      position: relative;
+    }
+
+    .vidrio::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      opacity: var(--brillo, 0);
+      transition: opacity 0.35s;
+      background: radial-gradient(380px circle at var(--mx, 50%) var(--my, 0%), rgba(255, 255, 255, 0.16), transparent 62%);
+    }
+
+    .vidrio:hover {
+      --brillo: 1;
+    }
+
+    .superpuestas,
+    .dividido {
+      perspective: 1400px;
+    }
+
+    .kw {
+      color: var(--naranja);
+      font-weight: 600;
+    }
+
+    .kw2 {
+      color: var(--texto);
+      font-weight: 600;
+    }
+
+    .val {
+      color: var(--celeste);
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 0.6em;
+      height: 1.15em;
+      vertical-align: text-bottom;
+      background: var(--naranja);
+      margin-left: 2px;
+      animation: parpadeo 1s steps(1) infinite;
+    }
+
+    @keyframes parpadeo {
+      50% {
+        opacity: 0;
+      }
+    }
+
+    #afd-vivo {
+      margin-top: 18px;
+    }
+
+    #afd-vivo svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      overflow: visible;
+    }
+
+    #afd-vivo text {
+      font-family: var(--mono);
+    }
+
+    .afd-estado {
+      fill: rgba(255, 255, 255, 0.06);
+      stroke: rgba(255, 255, 255, 0.55);
+      stroke-width: 2;
+    }
+
+    .afd-arista {
+      stroke: rgba(255, 255, 255, 0.45);
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .afd-etq {
+      fill: var(--suave);
+      font-size: 15px;
+    }
+
+    .afd-nombre {
+      fill: var(--texto);
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .afd-celda {
+      fill: rgba(255, 255, 255, 0.06);
+      stroke: rgba(255, 255, 255, 0.3);
+      stroke-width: 1.5;
+    }
+
+    .afd-char {
+      fill: var(--texto);
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .afd-estatus {
+      font-family: var(--cuerpo) !important;
+      font-size: 17px;
+      font-weight: 700;
+      fill: var(--suave);
+    }
+
+    .afd-ficha {
+      fill: var(--naranja);
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script>if (!window.gsap) { document.write('<script src="gsap.min.js"><\/script>'); }</script>
+
+  <div class="progreso" id="progreso"></div>
+  <header class="barra">
+    <div class="marca"><i></i>RoboScript</div>
+    <div class="controles">
+      <span class="contador" id="contador">1 / 26</span>
+      <button class="btn" id="pantalla" type="button">Pantalla completa</button>
+    </div>
+  </header>
+  <nav class="puntos" id="puntos" aria-label="Diapositivas"></nav>
+
+  <main id="diapositivas">
+
+    <!-- 1. Portada -->
+    <section class="slide hero" id="portada" data-titulo="Portada"
+      style="--foto:url(img/robot.webp); --pos: 70% center">
+      <div class="in">
+        <p class="ceja" style="color:var(--naranja)">Proyecto final · Autómatas y Lenguajes Formales</p>
+        <h1>RoboScript</h1>
+        <p class="bajada">Un analizador léxico y sintáctico para un lenguaje de instrucciones de robots.</p>
+        <div class="autores">
+          <strong>Marlon Ivan Méndez Rojas · Rudy Alexander Choc Cú</strong>
+          <span>Ing. Mario Fuentes · Universidad Mariano Gálvez de Guatemala</span>
+        </div>
+        <button class="btn bajar" type="button" data-ir="1">Comenzar ↓</button>
+        <p class="teclas">Avance con <kbd>→</kbd> <kbd>↓</kbd> o <kbd>Espacio</kbd>, retroceda con <kbd>←</kbd>
+          <kbd>↑</kbd>.
+        </p>
+      </div>
+    </section>
+
+    <!-- 2. Sección 01 -->
+    <section class="slide hero" id="lenguaje" data-titulo="El lenguaje" style="--foto:url(img/nubes.webp)">
+      <div class="in">
+        <div class="num">01</div>
+        <h1>El lenguaje.</h1>
+        <p class="bajada">Qué es RoboScript y cómo se analiza.</p>
+      </div>
+    </section>
+
+    <!-- 3. Qué es -->
+    <section class="slide" id="que-es" data-titulo="Qué es"
+      style="--foto:url(img/radiante.webp); --filtro: blur(14px); --zoom:1.08">
+      <div class="in">
+        <p class="ceja">El lenguaje</p>
+        <h2>Instrucciones simples. Reglas estrictas.</h2>
+        <div class="dividido inv">
+          <div class="vidrio">
+            <pre id="tecleo">ROBOT 123ROB
+INICIO X10,Y05
+AVANZAR 5
+GIRAR DERECHA
+LEVANTAR OBJ-0025
+MOVER X20,Y15
+SOLTAR
+SEGUIR LINEA 30s
+SI OBSTACULO
+   GIRAR IZQUIERDA
+FIN
+REPETIR 2
+   AVANZAR 10
+FIN</pre>
+          </div>
+          <div>
+            <div class="pasos-lista">
+              <p><b style="color:var(--celeste)">Lee</b>un archivo .robot cargado o escrito en la página.</p>
+              <p><b style="color:var(--naranja)">Reconoce</b>cada token y verifica la gramática con ANTLR 4.</p>
+              <p><b>Reporta</b>cada error con su línea, el árbol y un resumen.</p>
+            </div>
+            <p class="nota"><em>No es un robot ni una simulación: el objetivo es reconocer el lenguaje.</em></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Arquitectura -->
+    <section class="slide" id="arquitectura" data-titulo="Arquitectura"
+      style="--foto:url(img/mezcla.webp); --filtro: blur(10px); --zoom:1.06">
+      <div class="in">
+        <p class="ceja">Arquitectura</p>
+        <h2>Del archivo al reporte, en cinco pasos.</h2>
+        <div class="rejilla c5">
+          <div class="vidrio">
+            <div class="tarjeta-num">01</div>
+            <div class="tarjeta-tit">Entrada</div>
+            <div class="tarjeta-txt">Archivo .robot o código pegado</div>
+          </div>
+          <div class="vidrio">
+            <div class="tarjeta-num" style="color:var(--celeste)">02</div>
+            <div class="tarjeta-tit">Lexer</div>
+            <div class="tarjeta-txt">Expresiones regulares → tokens</div>
+          </div>
+          <div class="vidrio">
+            <div class="tarjeta-num" style="color:var(--naranja)">03</div>
+            <div class="tarjeta-tit">Parser</div>
+            <div class="tarjeta-txt">Gramática LL(1) → árbol</div>
+          </div>
+          <div class="vidrio">
+            <div class="tarjeta-num" style="color:var(--celeste)">04</div>
+            <div class="tarjeta-tit">Recorrido</div>
+            <div class="tarjeta-txt">Visitor: resumen y árbol</div>
+          </div>
+          <div class="vidrio">
+            <div class="tarjeta-num" style="color:var(--naranja)">05</div>
+            <div class="tarjeta-tit">Reporte</div>
+            <div class="tarjeta-txt">Tokens, errores y resumen</div>
+          </div>
+        </div>
+        <p class="nota" style="color:var(--texto); font-size:18px">Los errores de cada etapa se registran aparte y el
+          análisis continúa. Cada resultado se guarda en el historial (H2).</p>
+        <p class="nota" style="margin-top:8px">Spring Boot · ANTLR 4 · patrón MVC con capa de servicio</p>
+      </div>
+    </section>
+
+    <!-- 5. Tecnologías -->
+    <section class="slide" id="tecnologias" data-titulo="Tecnologías"
+      style="--foto:url(img/codigo.webp); --filtro: blur(6px); --velo: rgba(6,7,9,.72)">
+      <div class="in">
+        <p class="ceja">Tecnologías</p>
+        <h2>Herramientas profesionales, de punta a punta.</h2>
+        <div class="rejilla c3">
+          <div class="vidrio"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="#5ac8fa" stroke-width="1.8">
+              <path d="M4 20c8 0 16-6 16-16C10 4 4 10 4 20Zm0 0 9-9" />
+            </svg>
+            <div class="tarjeta-tit">Spring Boot</div>
+            <div class="tarjeta-txt">Aplicación web en Java con patrón MVC</div>
+          </div>
+          <div class="vidrio"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="#ff9f0a" stroke-width="1.8">
+              <circle cx="12" cy="12" r="3.2" />
+              <path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9 7 7m10 10 2.1 2.1M4.9 19.1 7 17m10-10 2.1-2.1" />
+            </svg>
+            <div class="tarjeta-tit">ANTLR 4.13</div>
+            <div class="tarjeta-txt">Genera el lexer y el parser desde la gramática</div>
+          </div>
+          <div class="vidrio"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="#ff9f0a" stroke-width="1.8">
+              <ellipse cx="12" cy="5.5" rx="7.5" ry="3" />
+              <path d="M4.5 5.5v13c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v-13M4.5 12c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3" />
+            </svg>
+            <div class="tarjeta-tit">JPA + H2</div>
+            <div class="tarjeta-txt">Historial de análisis en base embebida</div>
+          </div>
+          <div class="vidrio"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="#f5f5f7" stroke-width="1.8">
+              <path d="m8 7-5 5 5 5m8-10 5 5-5 5M14 4l-4 16" />
+            </svg>
+            <div class="tarjeta-tit">Thymeleaf + SVG</div>
+            <div class="tarjeta-txt">Tokens, árbol y autómatas dibujados</div>
+          </div>
+          <div class="vidrio"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="#5ac8fa" stroke-width="1.8">
+              <circle cx="12" cy="12" r="9" />
+              <path d="m7.5 12.5 3 3 6-6.5" />
+            </svg>
+            <div class="tarjeta-tit">JUnit 5</div>
+            <div class="tarjeta-txt">39 pruebas automáticas</div>
+          </div>
+          <div class="vidrio"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="#ff9f0a" stroke-width="1.8">
+              <circle cx="5" cy="6" r="2.5" />
+              <circle cx="19" cy="6" r="2.5" />
+              <circle cx="12" cy="18" r="2.5" />
+              <path d="M7.5 6h9M6.3 8.2l4.4 7.6m6.9-7.6-4.4 7.6" />
+            </svg>
+            <div class="tarjeta-tit">JFLAP 7</div>
+            <div class="tarjeta-txt">Autómatas y gramática verificados</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. La aplicación -->
+    <section class="slide" id="aplicacion" data-titulo="La aplicación"
+      style="--foto:url(img/radiante.webp); --filtro: blur(14px); --zoom:1.08">
+      <div class="in">
+        <p class="ceja">La aplicación</p>
+        <h2>Cargar. Analizar. Revisar.</h2>
+        <div class="superpuestas">
+          <img class="ventana atras" src="img/v_inicio.webp"
+            alt="Página principal con el archivo 01_valido_recorrido.robot cargado" width="1800" height="996">
+          <img class="ventana frente" src="img/v_valido.webp"
+            alt="Resultado del análisis: archivo válido, 32 tokens y 13 instrucciones" width="1800" height="1183">
+        </div>
+        <p class="nota">Página principal y resultado de 01_valido_recorrido.robot: válido, 32 tokens, 13 instrucciones.
+        </p>
+      </div>
+    </section>
+
+    <!-- 7. Sección 02 -->
+    <section class="slide hero" id="lexico" data-titulo="Análisis léxico" style="--foto:url(img/brasa.webp)">
+      <div class="in">
+        <div class="num">02</div>
+        <h1>Análisis léxico.</h1>
+        <p class="bajada">De caracteres sueltos a tokens con nombre.</p>
+      </div>
+    </section>
+
+    <!-- 8. Tokens -->
+    <section class="slide" id="tokens" data-titulo="Tokens"
+      style="--foto:url(img/circuito.webp); --velo: rgba(6,7,9,.66)">
+      <div class="in">
+        <p class="ceja">Análisis léxico</p>
+        <h2>27 tokens. Cada uno, una expresión regular.</h2>
+        <div class="dividido inv" style="grid-template-columns:minmax(0,.55fr) minmax(0,1.45fr)">
+          <div class="cifras">
+            <div class="dato"><span class="grande" data-cuenta="18">18</span><span>palabras reservadas</span></div>
+            <div class="dato"><span class="grande" style="color:var(--naranja)" data-cuenta="6">6</span><span>tokens con
+                formato</span></div>
+            <div class="dato"><span class="grande" style="color:var(--celeste)" data-cuenta="3">3</span><span>tokens
+                adicionales</span></div>
+          </div>
+          <div class="vidrio tabla-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Token</th>
+                  <th>Expresión regular</th>
+                  <th>Válido</th>
+                  <th>Inválido</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><b>CODIGO_ROBOT</b></td>
+                  <td class="mono">[0-9]{3}[A-Z]{3}</td>
+                  <td class="mono ok">123ROB</td>
+                  <td class="mono mal">12ROB</td>
+                </tr>
+                <tr>
+                  <td><b>CODIGO_ZONA</b></td>
+                  <td class="mono">Z-[0-9]{2}</td>
+                  <td class="mono ok">Z-05</td>
+                  <td class="mono mal">Z-5</td>
+                </tr>
+                <tr>
+                  <td><b>CODIGO_OBJETO</b></td>
+                  <td class="mono">OBJ-[0-9]{4}</td>
+                  <td class="mono ok">OBJ-0025</td>
+                  <td class="mono mal">OBJ-25</td>
+                </tr>
+                <tr>
+                  <td><b>COORDENADA</b></td>
+                  <td class="mono">X[0-9]{2},Y[0-9]{2}</td>
+                  <td class="mono ok">X10,Y25</td>
+                  <td class="mono mal">X5,Y5</td>
+                </tr>
+                <tr>
+                  <td><b>PORCENTAJE</b></td>
+                  <td class="mono">(100|[1-9]?[0-9])%</td>
+                  <td class="mono ok">75%</td>
+                  <td class="mono mal">150%</td>
+                </tr>
+                <tr>
+                  <td><b>DURACION</b></td>
+                  <td class="mono">[0-9]{2}(s|m)</td>
+                  <td class="mono ok">30s</td>
+                  <td class="mono mal">5s</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="nota">En la aplicación cada tipo aparece con el prefijo T_, como pide el enunciado. Espacios y
+          comentarios // se ignoran.</p>
+      </div>
+    </section>
+
+    <!-- 9. Autómatas -->
+    <section class="slide" id="automatas" data-titulo="Autómatas"
+      style="--foto:url(img/radiante.webp); --filtro: blur(14px); --zoom:1.08">
+      <div class="in">
+        <p class="ceja" style="color:var(--naranja)">Autómatas finitos</p>
+        <h2>Cada expresión regular es un autómata.</h2>
+        <div class="dividido" style="grid-template-columns:minmax(0,1.7fr) minmax(0,.6fr)">
+          <div class="vidrio">
+            <img class="diagrama" data-revelar="x" src="img/d_porcentaje.webp" alt="AFD de PORCENTAJE" width="2400"
+              height="920">
+            <div id="afd-vivo" role="img"
+              aria-label="Simulación del AFD de CODIGO_ROBOT: 12ROB se rechaza en q2 y 123ROB se acepta en q6"></div>
+            <p class="suave" style="font-size:13px; margin-top:10px">Arriba PORCENTAJE · abajo CODIGO_ROBOT en vivo:
+              12ROB se rechaza en q2, 123ROB se acepta.</p>
+          </div>
+          <div class="tabla-scroll">
+            <table>
+              <tbody>
+                <tr>
+                  <td class="mono ok" style="font-size:22px">100%</td>
+                  <td class="suave">acepta</td>
+                </tr>
+                <tr>
+                  <td class="mono ok" style="font-size:22px">75%</td>
+                  <td class="suave">acepta</td>
+                </tr>
+                <tr>
+                  <td class="mono ok" style="font-size:22px">0%</td>
+                  <td class="suave">acepta</td>
+                </tr>
+                <tr>
+                  <td class="mono mal" style="font-size:22px">101%</td>
+                  <td class="suave">rechaza</td>
+                </tr>
+                <tr>
+                  <td class="mono mal" style="font-size:22px">150%</td>
+                  <td class="suave">rechaza</td>
+                </tr>
+                <tr>
+                  <td class="mono mal" style="font-size:22px">05%</td>
+                  <td class="suave">rechaza</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="suave" style="font-size:13px; margin-top:12px">9 autómatas, verificados en JFLAP y simulados paso
+              a paso en la aplicación.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. Autómata en la aplicación -->
+    <section class="slide" id="automata-vivo" data-titulo="Autómata en vivo"
+      style="--foto:url(img/mezcla.webp); --filtro: blur(10px); --zoom:1.06">
+      <div class="in">
+        <p class="ceja" style="color:var(--naranja)">En la aplicación</p>
+        <h2>El autómata, paso a paso.</h2>
+        <div class="dividido" style="grid-template-columns:minmax(0,1.9fr) minmax(0,.6fr)">
+          <img class="ventana" src="img/v_afd.webp"
+            alt="Simulación del AFD de CODIGO_ROBOT con la cadena 12ROB, rechazada en q2" width="1800" height="733">
+          <div class="cifras">
+            <div>
+              <p class="suave">Cadena</p>
+              <p class="mono" style="font-size:26px; font-weight:600">12ROB</p>
+            </div>
+            <div>
+              <p class="suave">Se detiene en</p>
+              <p class="mono" style="font-size:26px; font-weight:600; color:var(--rojo)">q2</p>
+            </div>
+            <div>
+              <p class="suave">Motivo</p>
+              <p style="font-size:19px; font-weight:700">sin transición con 'R'</p>
+            </div>
+          </div>
+        </div>
+        <p class="nota">Cada token tiene su página: diagrama, tabla de transiciones δ, definición formal y simulador con
+          botones para avanzar símbolo por símbolo.</p>
+      </div>
+    </section>
+
+    <!-- 11. Errores léxicos -->
+    <section class="slide" id="errores-lexicos" data-titulo="Errores léxicos"
+      style="--foto:url(img/mezcla.webp); --filtro: blur(10px); --zoom:1.06">
+      <div class="in">
+        <p class="ceja" style="color:var(--rojo)">Errores léxicos</p>
+        <h2>Un error. Un mensaje. Sin cascada.</h2>
+        <div class="dividido inv">
+          <div>
+            <p class="mono" style="font-size:clamp(28px,3.4vw,40px); font-weight:600">ROBOT 12ROB</p>
+            <p class="suave" style="margin-top:14px; font-size:18px">Sin una regla de error, 12 se leería como NUMERO y
+              ROB como IDENTIFICADOR, y el parser daría un error que no explica la causa.</p>
+          </div>
+          <div class="vidrio rojo">
+            <p class="ceja" style="color:var(--rojo)">Con ERR_CODIGO_ROBOT</p>
+            <pre style="font-size:clamp(14px,1.4vw,17px); white-space:pre-wrap">ERROR LÉXICO: Línea 1, Columna 7
+12ROB no cumple con la expresión regular de CODIGO_ROBOT</pre>
+            <p class="suave" style="font-size:14px; margin-top:12px">El token llega al parser con su tipo correcto: cero
+              errores de rebote.</p>
+          </div>
+        </div>
+        <div class="chips">
+          <span>12ROB</span><span>Z-5</span><span>OBJ-25</span><span>X5,Y5</span><span>150%</span><span>5s</span><span>@
+            #</span>
+        </div>
+        <p class="nota">Seis reglas ERR_, una por token con formato, y SIMBOLO_INVALIDO para todo lo demás.</p>
+      </div>
+    </section>
+
+    <!-- 12. Sección 03 -->
+    <section class="slide hero" id="sintactico" data-titulo="Análisis sintáctico" style="--foto:url(img/cielo.webp)">
+      <div class="in">
+        <div class="num">03</div>
+        <h1>Análisis sintáctico.</h1>
+        <p class="bajada">De tokens a un programa con estructura.</p>
+      </div>
+    </section>
+
+    <!-- 13. Gramática -->
+    <section class="slide" id="gramatica" data-titulo="Gramática"
+      style="--foto:url(img/ondas.webp); --velo: rgba(6,7,9,.5)">
+      <div class="in">
+        <p class="ceja" style="color:var(--naranja)">Análisis sintáctico</p>
+        <h2>Una gramática. Cero ambigüedad.</h2>
+        <div class="dividido" style="grid-template-columns:minmax(0,1.7fr) minmax(0,.6fr)">
+          <div class="vidrio">
+            <pre>programa    ::= declaracionRobot posicionInicial instruccion*
+instruccion ::= avanzar | girar | seguirLinea | levantar
+              | mover | soltar | velocidad | repetir | condicional
+avanzar     ::= AVANZAR NUMERO
+girar       ::= GIRAR ( DERECHA | IZQUIERDA )
+mover       ::= MOVER ( COORDENADA | CODIGO_ZONA )
+repetir     ::= REPETIR NUMERO bloque FIN
+condicional ::= SI condicion bloque ( SINO bloque )? FIN
+condicion   ::= OBSTACULO | operando OP_REL operando</pre>
+          </div>
+          <div class="cifras">
+            <div>
+              <p class="grande" style="color:var(--naranja)" data-cuenta="29">29</p>
+              <p>producciones en BNF</p>
+            </div>
+            <div>
+              <p class="grande" style="color:var(--celeste)">LL(1)</p>
+              <p>sin conflictos en la tabla</p>
+            </div>
+          </div>
+        </div>
+        <p class="nota">Los bloques SI y REPETIR anidados necesitan una pila para emparejar cada FIN: un autómata finito
+          no basta.</p>
+      </div>
+    </section>
+
+    <!-- 14. Tabla LL(1) -->
+    <section class="slide" id="tabla-ll1" data-titulo="Tabla LL(1)"
+      style="--foto:url(img/radiante.webp); --filtro: blur(14px); --zoom:1.08">
+      <div class="in">
+        <p class="ceja">Tabla LL(1)</p>
+        <h2>Un token basta para decidir.</h2>
+        <div class="dividido" style="grid-template-columns:minmax(0,1.7fr) minmax(0,.6fr)">
+          <div class="vidrio"><img class="diagrama" data-revelar="x" src="img/d_ll1.webp"
+              alt="Tabla de análisis LL(1) de RoboScript" width="2140" height="1018"></div>
+          <div class="pasos-lista">
+            <p><b style="color:var(--celeste); font-size:20px">FIRST disjuntos</b><span class="suave">Las 10
+                instrucciones empiezan con 10 tokens distintos.</span></p>
+            <p><b style="color:var(--celeste); font-size:20px">FOLLOW sin cruces</b><span class="suave">lista → ε solo
+                con $, FIN o SINO.</span></p>
+            <p><b style="color:var(--celeste); font-size:20px">Celdas únicas</b><span class="suave">Una producción por
+                celda; vacía = error.</span></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 15. Traza -->
+    <section class="slide" id="pila" data-titulo="La pila"
+      style="--foto:url(img/radiante.webp); --filtro: blur(14px); --zoom:1.08">
+      <div class="in">
+        <p class="ceja">En la aplicación</p>
+        <h2>La pila, paso a paso.</h2>
+        <div class="dividido" style="grid-template-columns:minmax(0,1.5fr) minmax(0,.8fr)">
+          <img class="ventana" src="img/v_traza.webp" alt="Traza del análisis LL(1) de un programa con GIRAR ARRIBA"
+            width="1800" height="1193">
+          <div class="cifras">
+            <div>
+              <p class="suave">Entrada</p>
+              <p class="mono" style="font-size:22px; font-weight:600">GIRAR ARRIBA</p>
+            </div>
+            <div>
+              <p class="suave">Celda consultada</p>
+              <p class="mono" style="font-size:17px; font-weight:600">[direccion, IDENTIFICADOR]</p>
+            </div>
+            <div>
+              <p class="suave">Resultado</p>
+              <p style="font-size:22px; font-weight:800; color:var(--rojo)">vacía → error</p>
+            </div>
+            <p class="suave" style="font-size:15px">La pila muestra el tope a la izquierda; cada fila es una acción:
+              expandir con una producción o emparejar un token.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 16. Errores sintácticos -->
+    <section class="slide" id="errores-sintacticos" data-titulo="Errores sintácticos"
+      style="--foto:url(img/mezcla.webp); --filtro: blur(10px); --zoom:1.06">
+      <div class="in">
+        <p class="ceja" style="color:var(--rojo)">Errores sintácticos</p>
+        <h2>Mensajes claros. Y el análisis sigue.</h2>
+        <div class="vidrio error-fila"><code>missing NUMERO at 'GIRAR'</code><span class="flecha">→</span><span>Línea 4:
+            Se esperaba NUMERO después de AVANZAR.</span></div>
+        <div class="vidrio error-fila"><code>mismatched input 'ARRIBA'</code><span class="flecha">→</span><span>Línea 5:
+            Se esperaba DERECHA o IZQUIERDA después de GIRAR.</span></div>
+        <div class="vidrio error-fila"><code>(producción de error)</code><span class="flecha">→</span><span>Se esperaba
+            FIN (bloque REPETIR iniciado en la línea 14).</span></div>
+        <div class="dato" style="margin-top:34px"><span class="grande" style="color:var(--naranja)"
+            data-cuenta="8">8</span><span style="font-size:19px">errores en un solo análisis del ejemplo inválido: 4
+            léxicos y 4 sintácticos, incluidos dos bloques sin FIN.</span></div>
+      </div>
+    </section>
+
+    <!-- 17. Pantalla de errores -->
+    <section class="slide" id="pantalla-errores" data-titulo="Pantalla de errores"
+      style="--foto:url(img/mezcla.webp); --filtro: blur(10px); --zoom:1.06">
+      <div class="in">
+        <p class="ceja" style="color:var(--rojo)">En la aplicación</p>
+        <h2>Todos los errores, en una pantalla.</h2>
+        <div class="dividido" style="grid-template-columns:minmax(0,1.6fr) minmax(0,.7fr)">
+          <img class="ventana" src="img/v_invalido.webp"
+            alt="Resultado de 05_invalido_enunciado.robot con 4 errores léxicos y 4 sintácticos" width="1800"
+            height="1183">
+          <div class="cifras">
+            <div>
+              <p class="grande" style="color:var(--rojo); font-size:48px">4 + 4</p>
+              <p>errores léxicos y sintácticos, con línea y columna</p>
+            </div>
+            <div>
+              <p class="grande" style="color:var(--naranja); font-size:48px" data-cuenta="16">16</p>
+              <p>tokens reconocidos aun con errores</p>
+            </div>
+            <div>
+              <p class="grande" style="color:var(--celeste); font-size:48px">1</p>
+              <p>solo análisis: no se detiene en el primero</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 18. Árbol -->
+    <section class="slide" id="arbol" data-titulo="Árbol sintáctico"
+      style="--foto:url(img/ondas.webp); --velo: rgba(6,7,9,.5)">
+      <div class="in">
+        <p class="ceja">Árbol sintáctico</p>
+        <h2>Cada archivo, con su árbol.</h2>
+        <div class="vidrio tabla-scroll"><img class="diagrama" data-revelar="y" src="img/d_arbol.webp"
+            alt="Árbol sintáctico de 01_valido_recorrido.robot" width="2400" height="566" style="min-width:760px"></div>
+        <div class="rejilla c3" style="margin-top:24px; align-items:center">
+          <div class="dato"><span class="grande" style="color:var(--naranja); font-size:46px"
+              data-cuenta="67">67</span><span class="suave">nodos</span></div>
+          <div class="dato"><span class="grande" style="color:var(--naranja); font-size:46px"
+              data-cuenta="8">8</span><span class="suave">niveles</span></div>
+          <div class="dato"><span class="grande" style="color:var(--naranja); font-size:46px"
+              data-cuenta="32">32</span><span class="suave">hojas = tokens</span></div>
+        </div>
+        <p class="nota">Los errores aparecen en rojo («falta NUMERO», «falta FIN») en el lugar exacto de la derivación.
+          El árbol se descarga en PNG.</p>
+      </div>
+    </section>
+
+    <!-- 19. Sección 04 -->
+    <section class="slide hero" id="resultados" data-titulo="Resultados" style="--foto:url(img/circuito.webp)">
+      <div class="in">
+        <div class="num">04</div>
+        <h1>Resultados.</h1>
+        <p class="bajada">Archivos de prueba, pruebas unitarias y demostración.</p>
+      </div>
+    </section>
+
+    <!-- 20. Archivos de prueba -->
+    <section class="slide" id="archivos" data-titulo="Archivos de prueba"
+      style="--foto:url(img/circuito.webp); --velo: rgba(6,7,9,.68)">
+      <div class="in">
+        <p class="ceja">Resultados</p>
+        <h2>Cinco archivos. Todos los casos.</h2>
+        <div class="vidrio tabla-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Archivo</th>
+                <th>Resultado</th>
+                <th>Léxicos</th>
+                <th>Sintácticos</th>
+                <th>Qué prueba</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="mono">01_valido_recorrido.robot</td>
+                <td class="ok">Válido</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="suave">Ejemplo válido del enunciado</td>
+              </tr>
+              <tr>
+                <td class="mono">02_valido_completo.robot</td>
+                <td class="ok">Válido</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="suave">Todas las estructuras del lenguaje</td>
+              </tr>
+              <tr>
+                <td class="mono">03_invalido_lexico.robot</td>
+                <td class="mal">No válido</td>
+                <td>8</td>
+                <td>0</td>
+                <td class="suave">Un error por token con formato</td>
+              </tr>
+              <tr>
+                <td class="mono">04_invalido_sintactico.robot</td>
+                <td class="mal">No válido</td>
+                <td>0</td>
+                <td>6</td>
+                <td class="suave">Tokens válidos en orden incorrecto</td>
+              </tr>
+              <tr>
+                <td class="mono">05_invalido_enunciado.robot</td>
+                <td class="mal">No válido</td>
+                <td>4</td>
+                <td>4</td>
+                <td class="suave">Ejemplo inválido del enunciado</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="nota">Se detectan los seis errores del enunciado: código de robot, AVANZAR incompleto, giro no válido,
+          código de objeto, símbolo no reconocido y SI/REPETIR sin FIN.</p>
+      </div>
+    </section>
+
+    <!-- 21. Historial -->
+    <section class="slide" id="historial" data-titulo="Historial"
+      style="--foto:url(img/radiante.webp); --filtro: blur(14px); --zoom:1.08">
+      <div class="in">
+        <p class="ceja">Historial</p>
+        <h2>Cada análisis queda guardado.</h2>
+        <div class="superpuestas" style="padding-bottom:16%">
+          <img class="ventana atras" src="img/v_historial.webp" alt="Historial con los cinco análisis" width="1800"
+            height="683">
+          <img class="ventana frente" src="img/v_detalle.webp" alt="Detalle de un análisis guardado" width="1800"
+            height="1183" style="width:52%; top:28%">
+        </div>
+        <p class="nota">H2 guarda archivo, fecha, resultado, conteos, código y reporte. Se puede abrir o eliminar cada
+          análisis.</p>
+      </div>
+    </section>
+
+    <!-- 22. JUnit -->
+    <section class="slide" id="pruebas" data-titulo="Pruebas"
+      style="--foto:url(img/ondas.webp); --velo: rgba(6,7,9,.55)">
+      <div class="in">
+        <p class="ceja">Calidad</p>
+        <h2>39 pruebas. Todas en verde.</h2>
+        <div class="dividido inv" style="grid-template-columns:minmax(0,.6fr) minmax(0,1.4fr)">
+          <div>
+            <p class="grande" style="color:var(--verde); font-size:clamp(80px,11vw,140px)" data-cuenta="39">39</p>
+            <p class="suave" style="font-size:17px">pruebas JUnit 5, incluidas pruebas parametrizadas que repiten un
+              caso con varios datos.</p>
+          </div>
+          <div class="vidrio barras" role="img"
+            aria-label="Pruebas por grupo: Analizador 18, Autómatas y LL(1) 14, Árbol sintáctico 5, Servicio 2">
+            <div class="barra-fila"><span>Analizador</span>
+              <div class="barra-pista"><i style="width:calc((100% - 40px) * 18 / 18)"></i><b>18</b></div>
+            </div>
+            <div class="barra-fila"><span>Autómatas y LL(1)</span>
+              <div class="barra-pista"><i style="width:calc((100% - 40px) * 14 / 18)"></i><b>14</b></div>
+            </div>
+            <div class="barra-fila"><span>Árbol sintáctico</span>
+              <div class="barra-pista"><i style="width:calc((100% - 40px) * 5 / 18)"></i><b>5</b></div>
+            </div>
+            <div class="barra-fila"><span>Servicio</span>
+              <div class="barra-pista"><i style="width:calc((100% - 40px) * 2 / 18)"></i><b>2</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 23. Demostración -->
+    <section class="slide" id="demostracion" data-titulo="Demostración"
+      style="--foto:url(img/codigo.webp); --filtro: blur(6px); --velo: rgba(6,7,9,.72)">
+      <div class="in">
+        <p class="ceja" style="color:var(--naranja)">Demostración</p>
+        <h2>Seis pasos para verlo funcionar.</h2>
+        <div class="rejilla c3">
+          <div class="vidrio">
+            <div class="tarjeta-num" style="color:var(--naranja); font-size:34px">1</div>
+            <div class="tarjeta-tit">Archivo válido</div>
+            <div class="tarjeta-txt">01_valido_recorrido.robot: verde, 32 tokens.</div>
+          </div>
+          <div class="vidrio">
+            <div class="tarjeta-num" style="color:var(--naranja); font-size:34px">2</div>
+            <div class="tarjeta-tit">Árbol</div>
+            <div class="tarjeta-txt">El árbol completo del mismo archivo.</div>
+          </div>
+          <div class="vidrio">
+            <div class="tarjeta-num" style="color:var(--naranja); font-size:34px">3</div>
+            <div class="tarjeta-tit">Archivo inválido</div>
+            <div class="tarjeta-txt">05_invalido_enunciado.robot: 8 errores.</div>
+          </div>
+          <div class="vidrio">
+            <div class="tarjeta-num" style="color:var(--naranja); font-size:34px">4</div>
+            <div class="tarjeta-tit">Autómata</div>
+            <div class="tarjeta-txt">Simular 12ROB y ver dónde se rechaza.</div>
+          </div>
+          <div class="vidrio">
+            <div class="tarjeta-num" style="color:var(--naranja); font-size:34px">5</div>
+            <div class="tarjeta-tit">Gramática LL(1)</div>
+            <div class="tarjeta-txt">Tabla y traza con pila de un error.</div>
+          </div>
+          <div class="vidrio">
+            <div class="tarjeta-num" style="color:var(--naranja); font-size:34px">6</div>
+            <div class="tarjeta-tit">Historial y pruebas</div>
+            <div class="tarjeta-txt">H2 y las 39 pruebas en IntelliJ.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 24. Sección 05 -->
+    <section class="slide hero" id="cierre" data-titulo="Cierre" style="--foto:url(img/calido.webp)">
+      <div class="in">
+        <div class="num">05</div>
+        <h1>Cierre.</h1>
+        <p class="bajada">Lo que aprendimos construyendo RoboScript.</p>
+      </div>
+    </section>
+
+    <!-- 25. Conclusiones -->
+    <section class="slide" id="conclusiones" data-titulo="Conclusiones"
+      style="--foto:url(img/calido.webp); --filtro: blur(14px); --zoom:1.08; --velo: rgba(6,7,9,.55)">
+      <div class="in">
+        <p class="ceja">Conclusiones</p>
+        <h2>Lo que aprendimos.</h2>
+        <div class="rejilla c2">
+          <div class="vidrio">
+            <div class="tarjeta-tit" style="margin:0; color:var(--naranja)">Expresiones regulares en ANTLR</div>
+            <p style="margin-top:10px; font-size:18px">generan el autómata de cada token sin escribir la lectura a mano.
+            </p>
+          </div>
+          <div class="vidrio">
+            <div class="tarjeta-tit" style="margin:0">Reglas de error</div>
+            <p style="margin-top:10px; font-size:18px">dan mensajes exactos y evitan errores en cascada.</p>
+          </div>
+          <div class="vidrio">
+            <div class="tarjeta-tit" style="margin:0; color:var(--celeste)">Gramática LL(1)</div>
+            <p style="margin-top:10px; font-size:18px">cada instrucción empieza con un token distinto.</p>
+          </div>
+          <div class="vidrio">
+            <div class="tarjeta-tit" style="margin:0; color:var(--naranja)">Autómatas y pilas</div>
+            <p style="margin-top:10px; font-size:18px">los tokens usan autómatas finitos; el programa, una pila.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 26. Gracias -->
+    <section class="slide hero" id="gracias" data-titulo="Gracias"
+      style="--foto:url(img/robot.webp); --pos: 70% center; --velo: linear-gradient(90deg, rgba(6,7,9,.9), rgba(6,7,9,.5) 60%, rgba(6,7,9,.35))">
+      <div class="in">
+        <h1>Gracias.</h1>
+        <p class="bajada">¿Preguntas?</p>
+        <div class="autores"><strong>Marlon Ivan Méndez Rojas · Rudy Alexander Choc Cú</strong></div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    (() => {
+      const slides = [...document.querySelectorAll('.slide')];
+      const total = slides.length;
+      const contador = document.getElementById('contador');
+      const progreso = document.getElementById('progreso');
+      const puntos = document.getElementById('puntos');
+      let actual = 0;
+
+      slides.forEach((s, i) => {
+        const b = document.createElement('button');
+        b.className = 'punto'; b.type = 'button';
+        b.setAttribute('aria-label', (i + 1) + '. ' + (s.dataset.titulo || ''));
+        b.title = s.dataset.titulo || '';
+        b.addEventListener('click', () => ir(i));
+        puntos.appendChild(b);
+      });
+      const botones = [...puntos.children];
+
+      function marcar(i) {
+        actual = i;
+        contador.textContent = (i + 1) + ' / ' + total;
+        progreso.style.width = ((i + 1) / total * 100) + '%';
+        botones.forEach((b, j) => b.classList.toggle('activo', j === i));
+      }
+      function ir(i) {
+        i = Math.max(0, Math.min(total - 1, i));
+        slides[i].scrollIntoView({ behavior: 'smooth', block: 'start' });
+        marcar(i);
+      }
+
+      const obs = new IntersectionObserver(entradas => {
+        entradas.forEach(e => { if (e.isIntersecting) marcar(slides.indexOf(e.target)); });
+      }, { threshold: 0.55 });
+      slides.forEach(s => obs.observe(s));
+
+      document.addEventListener('keydown', e => {
+        if (e.target.closest('input, textarea')) return;
+        if (['ArrowDown', 'ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); ir(actual + 1); }
+        else if (['ArrowUp', 'ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); ir(actual - 1); }
+        else if (e.key === 'Home') { e.preventDefault(); ir(0); }
+        else if (e.key === 'End') { e.preventDefault(); ir(total - 1); }
+      });
+      document.querySelectorAll('[data-ir]').forEach(b => b.addEventListener('click', () => ir(+b.dataset.ir)));
+
+      const btnPantalla = document.getElementById('pantalla');
+      btnPantalla.addEventListener('click', async () => {
+        try {
+          if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
+          else await document.exitFullscreen();
+        } catch (err) { btnPantalla.textContent = 'No disponible aquí'; }
+      });
+      document.addEventListener('fullscreenchange', () => {
+        btnPantalla.textContent = document.fullscreenElement ? 'Salir' : 'Pantalla completa';
+      });
+
+      const inicio = slides.findIndex(s => '#' + s.id === location.hash);
+      marcar(inicio > 0 ? inicio : 0);
+      if (inicio > 0) slides[inicio].scrollIntoView({ block: 'start' });
+    })();
+  </script>
+
+  <script>
+    /* ===================== Animaciones (GSAP) =====================
+       Sin GSAP o con "reducir movimiento" activo, todo queda visible y estático. */
+    (() => {
+      const slides = [...document.querySelectorAll('.slide')];
+      const MOV = !!window.gsap && !/[?&]quieto/.test(location.search);
+
+      /* ---- Títulos grandes: cada palabra en su propia máscara ---- */
+      document.querySelectorAll('h1').forEach(h => {
+        h.innerHTML = h.textContent.trim().split(/\s+/).map(w => '<span class="palabra"><span>' + w + '</span></span>').join(' ');
+      });
+
+      /* ---- Código con colores, carácter por carácter (efecto de tecleo) ---- */
+      const pre = document.getElementById('tecleo');
+      let caracteres = [];
+      if (pre) {
+        const PAL2 = /^(DERECHA|IZQUIERDA|OBSTACULO|LINEA)$/;
+        const html = pre.textContent.split('\n').map(linea => {
+          let primera = true;
+          return linea.split(/(\s+)/).map(t => {
+            if (!t) return '';
+            if (/^\s+$/.test(t)) return t.replace(/ /g, '<i class="c"> </i>');
+            let cls = 'val';
+            if (primera) { cls = 'kw'; primera = false; } else if (PAL2.test(t)) cls = 'kw2';
+            return [...t].map(ch => '<i class="c ' + cls + '">' + ch + '</i>').join('');
+          }).join('');
+        }).join('<i class="c">\n</i>');
+        pre.innerHTML = html.replace(/<i class="c ([a-z0-9]+)">/g, '<span class="c $1">').replace(/<i class="c">/g, '<span class="c">').replace(/<\/i>/g, '</span>') + '<span class="cursor" aria-hidden="true"></span>';
+        caracteres = [...pre.querySelectorAll('.c')];
+      }
+
+      /* ---- Autómata de CODIGO_ROBOT dibujado y simulado en vivo ---- */
+      const afd = (() => {
+        const cont = document.getElementById('afd-vivo');
+        if (!cont) return null;
+        const NS = 'http://www.w3.org/2000/svg';
+        const el = (tag, at, padre) => { const e = document.createElementNS(NS, tag); for (const k in at) e.setAttribute(k, at[k]); (padre || svg).appendChild(e); return e; };
+        const svg = document.createElementNS(NS, 'svg');
+        svg.setAttribute('viewBox', '0 0 1000 230');
+        cont.appendChild(svg);
+        const defs = el('defs', {});
+        const mk = el('marker', { id: 'punta', viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: 'auto' }, defs);
+        el('path', { d: 'M0,0 L10,5 L0,10 z', fill: 'rgba(255,255,255,.6)' }, mk);
+        const X = i => 95 + i * 138, Y = 150, R = 29;
+        const etiquetas = ['0-9', '0-9', '0-9', 'A-Z', 'A-Z', 'A-Z'];
+        el('line', { x1: 18, y1: Y, x2: X(0) - R - 3, y2: Y, class: 'afd-arista', 'marker-end': 'url(#punta)' });
+        el('text', { x: 14, y: Y - 14, class: 'afd-etq' }).textContent = 'inicio';
+        etiquetas.forEach((t, i) => {
+          el('line', { x1: X(i) + R, y1: Y, x2: X(i + 1) - R - 3, y2: Y, class: 'afd-arista', 'marker-end': 'url(#punta)' });
+          el('text', { x: (X(i) + X(i + 1)) / 2, y: Y - 14, class: 'afd-etq', 'text-anchor': 'middle' }).textContent = t;
+        });
+        const estados = [];
+        for (let i = 0; i < 7; i++) {
+          const g = el('g', {});
+          const c = el('circle', { cx: X(i), cy: Y, r: R, class: 'afd-estado' }, g);
+          if (i === 6) el('circle', { cx: X(i), cy: Y, r: R - 6, class: 'afd-estado', style: 'fill:none' }, g);
+          el('text', { x: X(i), y: Y + 6, class: 'afd-nombre', 'text-anchor': 'middle' }, g).textContent = 'q' + i;
+          estados.push({ g, c });
+        }
+        const ficha = el('circle', { cx: X(0), cy: Y + R + 14, r: 6, class: 'afd-ficha' });
+        const cinta = el('g', {});
+        const estatus = el('text', { x: 500, y: 222, class: 'afd-estatus', 'text-anchor': 'middle' });
+        estatus.textContent = '';
+        let celdas = [];
+        function cintaDe(cad) {
+          cinta.innerHTML = ''; celdas = [];
+          const w = 46, x0 = 500 - (cad.length * w) / 2;
+          el('text', { x: x0 - 16, y: 50, class: 'afd-etq', 'text-anchor': 'end' }, cinta).textContent = 'cadena';
+          [...cad].forEach((ch, k) => {
+            const r = el('rect', { x: x0 + k * w, y: 22, width: w - 6, height: 40, rx: 8, class: 'afd-celda' }, cinta);
+            const t = el('text', { x: x0 + k * w + (w - 6) / 2, y: 49, class: 'afd-char', 'text-anchor': 'middle' }, cinta);
+            t.textContent = ch;
+            celdas.push(r);
+          });
+        }
+        const COL = { base: 'rgba(255,255,255,0.06)', borde: 'rgba(255,255,255,0.55)', act: 'rgba(90,200,250,0.28)', actB: '#5ac8fa', ok: 'rgba(48,209,88,0.3)', okB: '#30d158', mal: 'rgba(255,69,58,0.32)', malB: '#ff453a', celda: 'rgba(255,255,255,0.06)', celdaAct: 'rgba(255,159,10,0.35)' };
+        const valido = (k, ch) => (k < 3 ? /[0-9]/.test(ch) : k < 6 ? /[A-Z]/.test(ch) : false);
+        function pintar(i, f, b) { estados[i].c.setAttribute('style', 'fill:' + f + ';stroke:' + b); }
+        function limpiar() { estados.forEach((_, i) => pintar(i, COL.base, COL.borde)); celdas.forEach(c => c.setAttribute('style', '')); }
+        // Estado final estático (si no hay animación): 12ROB rechazada en q2
+        function estatico() { cintaDe('12ROB'); limpiar(); pintar(2, COL.mal, COL.malB); celdas[2].setAttribute('style', 'fill:' + COL.mal + ';stroke:' + COL.malB); ficha.setAttribute('cx', X(2)); estatus.textContent = "12ROB: rechazada en q2, sin transición con 'R'"; }
+        estatico();
+        if (!MOV) return null;
+
+        function corrida(cad) {
+          const tl = gsap.timeline();
+          tl.call(() => { cintaDe(cad); limpiar(); pintar(0, COL.act, COL.actB); gsap.set(ficha, { attr: { cx: X(0) } }); estatus.textContent = 'Simulando ' + cad + '…'; estatus.style.fill = ''; });
+          tl.to({}, { duration: 0.6 });
+          let q = 0, rechazo = false;
+          [...cad].forEach((ch, k) => {
+            if (rechazo) return;
+            tl.call(() => celdas[k].setAttribute('style', 'fill:' + COL.celdaAct + ';stroke:#ff9f0a'));
+            if (valido(k, ch)) {
+              const desde = q, hacia = q + 1;
+              tl.to(ficha, { attr: { cx: X(hacia) }, duration: 0.45, ease: 'power2.inOut' });
+              tl.call(() => { pintar(desde, COL.base, COL.borde); pintar(hacia, COL.act, COL.actB); celdas[k].setAttribute('style', 'fill:rgba(255,255,255,0.14);stroke:rgba(255,255,255,0.4)'); });
+              tl.fromTo(estados[hacia].g, { scale: 1.12, transformOrigin: X(hacia) + 'px ' + Y + 'px' }, { scale: 1, duration: 0.3, ease: 'back.out(3)' });
+              q = hacia;
+            } else {
+              rechazo = true;
+              const qq = q;
+              tl.call(() => { pintar(qq, COL.mal, COL.malB); celdas[k].setAttribute('style', 'fill:' + COL.mal + ';stroke:' + COL.malB); estatus.textContent = cad + ': rechazada en q' + qq + ", sin transición con '" + ch + "'"; estatus.style.fill = COL.malB; });
+              tl.fromTo(estados[qq].g, { x: -7 }, { x: 0, duration: 0.5, ease: 'elastic.out(1, 0.25)' });
+            }
+          });
+          if (!rechazo) {
+            tl.call(() => {
+              if (q === 6) { pintar(6, COL.ok, COL.okB); estatus.textContent = cad + ': aceptada en q6 (estado de aceptación)'; estatus.style.fill = COL.okB; }
+              else { pintar(q, COL.mal, COL.malB); estatus.textContent = cad + ': rechazada, q' + q + ' no es de aceptación'; estatus.style.fill = COL.malB; }
+            });
+          }
+          tl.to({}, { duration: 2 });
+          return tl;
+        }
+        const maestro = gsap.timeline({ repeat: -1, paused: true });
+        maestro.add(corrida('12ROB')).add(corrida('123ROB'));
+        return { play: () => maestro.restart(), pause: () => maestro.pause() };
+      })();
+
+      if (!MOV) return;
+
+      /* ---- Elementos que entran en cada diapositiva ---- */
+      const SEL = '.ceja, h2, .num, .bajada, .autores, .bajar, .teclas, .creditos, .nota, .rejilla > *, .dividido > *, .error-fila, .chips, .superpuestas > img, .barras';
+      const piezas = slides.map(s => {
+        const lista = [...s.querySelectorAll(SEL)];
+        const sinAnidar = lista.filter(e => !lista.some(o => o !== e && o.contains(e)));
+        const ventanas = [...s.querySelectorAll('.ventana')];
+        return {
+          items: sinAnidar.filter(e => !ventanas.includes(e)),
+          ventanas,
+          palabras: [...s.querySelectorAll('h1 .palabra > span')],
+          filas: [...s.querySelectorAll('tbody tr, .cifras > *, .pasos-lista > *, .chips span')],
+          barras: [...s.querySelectorAll('.barra-pista i')],
+          cuentas: [...s.querySelectorAll('[data-cuenta]')],
+          revelar: [...s.querySelectorAll('[data-revelar]')],
+          num: s.querySelector('.num'),
+          tecleo: s.contains(pre) ? caracteres : [],
+          afd: s.contains(document.getElementById('afd-vivo')),
+        };
+      });
+
+      function ocultar(i) {
+        const p = piezas[i];
+        gsap.killTweensOf([...p.items, ...p.ventanas, ...p.palabras, ...p.filas, ...p.barras, ...p.revelar]);
+        gsap.set([...p.items, ...p.ventanas, ...p.filas], { autoAlpha: 0 });
+        gsap.set(p.palabras, { yPercent: 110 });
+        gsap.set(p.barras, { scaleX: 0, transformOrigin: 'left center' });
+        p.revelar.forEach(im => gsap.set(im, { clipPath: im.dataset.revelar === 'y' ? 'inset(0% 0% 100% 0%)' : 'inset(0% 100% 0% 0%)' }));
+        if (p.num) gsap.set(p.num, { '--l': 0 });
+        p.cuentas.forEach(c => { c.textContent = '0'; });
+        if (p.tecleo.length) gsap.set(p.tecleo, { opacity: 0 });
+        if (p.afd && afd) afd.pause();
+      }
+
+      function animar(i) {
+        const s = slides[i], p = piezas[i];
+        gsap.fromTo(s, { '--kb': 1.14 }, { '--kb': 1, duration: 10, ease: 'sine.out' });
+        const tl = gsap.timeline();
+        tl.to(p.palabras, { yPercent: 0, duration: 1, stagger: 0.09, ease: 'power4.out' }, 0);
+        if (p.num) tl.to(p.num, { '--l': 1, duration: 0.9, ease: 'power3.out' }, 0.25);
+        tl.fromTo(p.items, { autoAlpha: 0, y: 34, filter: 'blur(10px)' }, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.85, stagger: 0.07, ease: 'power3.out', clearProps: 'filter' }, 0.05);
+        tl.fromTo(p.ventanas, { autoAlpha: 0, y: 70, rotationX: 16, scale: 0.94, transformPerspective: 1400 }, { autoAlpha: 1, y: 0, rotationX: 0, scale: 1, duration: 1.25, stagger: 0.18, ease: 'power3.out' }, 0.2);
+        tl.fromTo(p.filas, { autoAlpha: 0, x: -18 }, { autoAlpha: 1, x: 0, duration: 0.5, stagger: 0.06, ease: 'power2.out' }, 0.4);
+        tl.to(p.barras, { scaleX: 1, duration: 1.2, stagger: 0.14, ease: 'power3.out' }, 0.45);
+        tl.to(p.revelar, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.6, ease: 'power2.inOut' }, 0.35);
+        p.cuentas.forEach(c => {
+          const fin = +c.dataset.cuenta, o = { v: 0 };
+          tl.to(o, { v: fin, duration: 1.4, ease: 'power2.out', onUpdate: () => { c.textContent = Math.round(o.v); } }, 0.3);
+        });
+        if (p.tecleo.length) tl.to(p.tecleo, { opacity: 1, duration: 0.01, stagger: 0.016, ease: 'none' }, 0.6);
+        if (p.afd && afd) tl.call(() => afd.play(), null, 0.9);
+      }
+
+      // Todas ocultas salvo la primera, que entra al cargar
+      slides.forEach((_, i) => ocultar(i));
+      const activas = new Set();
+      const obsEntrada = new IntersectionObserver(es => es.forEach(e => {
+        const i = slides.indexOf(e.target);
+        if (e.isIntersecting && !activas.has(i)) { activas.add(i); animar(i); }
+      }), { threshold: 0.5 });
+      const obsSalida = new IntersectionObserver(es => es.forEach(e => {
+        const i = slides.indexOf(e.target);
+        if (!e.isIntersecting && activas.has(i)) { activas.delete(i); ocultar(i); }
+      }), { threshold: 0 });
+      slides.forEach(s => { obsEntrada.observe(s); obsSalida.observe(s); });
+
+      /* ---- Reflejo de luz que sigue al cursor sobre el vidrio ---- */
+      document.addEventListener('pointermove', e => {
+        const v = e.target.closest && e.target.closest('.vidrio');
+        if (!v) return;
+        const r = v.getBoundingClientRect();
+        v.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+        v.style.setProperty('--my', (e.clientY - r.top) + 'px');
+      });
+    })();
+  </script>
+
+</body>
+
+</html>

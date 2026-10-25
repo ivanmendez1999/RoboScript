@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RoboScript - Detalle del análisis</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<header th:replace="~{fragments :: encabezado}"></header>
+
+<main class="contenedor">
+    <div th:class="${h.valido} ? 'banner banner-ok' : 'banner banner-error'">
+        <div>
+            <div class="banner-titulo" th:text="${h.valido} ? '✓ ARCHIVO VÁLIDO' : '✗ ARCHIVO NO VÁLIDO'">✓ ARCHIVO VÁLIDO</div>
+            <div class="banner-archivo">
+                <span th:text="${h.nombreArchivo}">recorrido.robot</span> ·
+                <span th:text="${#temporals.format(h.fechaAnalisis, 'dd/MM/yyyy HH:mm')}">21/10/2026 22:00</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="dos-columnas">
+        <section class="tarjeta">
+            <h2>Código analizado</h2>
+            <div th:replace="~{fragments :: codigo}"></div>
+        </section>
+
+        <section class="tarjeta">
+            <h2>Reporte</h2>
+            <pre class="reporte" th:text="${h.reporte}">=====</pre>
+        </section>
+    </div>
+
+    <div class="acciones">
+        <a th:href="@{/historial}" class="boton boton-secundario">Volver al historial</a>
+        <a th:href="@{/}" class="boton">Nuevo análisis</a>
+    </div>
+</main>
+
+<footer th:replace="~{fragments :: pie}"></footer>
+</body>
+</html>

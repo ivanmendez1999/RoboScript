@@ -1,0 +1,24 @@
+/* =========================================================
+   Árbol sintáctico en la página de resultado
+   ========================================================= */
+
+.arbol-barra { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.arbol-datos { color: var(--texto-suave); font-size: .9rem; }
+.arbol-botones { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.arbol-botones .boton { padding: 7px 12px; font-size: .88rem; }
+#arbol-zoom { min-width: 48px; text-align: center; font-family: var(--mono); font-size: .85rem; color: var(--texto-suave); }
+
+.arbol-lienzo {
+    border: 1px dashed var(--borde); border-radius: 10px; background: #fff;
+    overflow: auto; max-height: 640px; padding: 10px;
+}
+#arbol-svg { display: block; margin: 0 auto; }
+
+.arbol-leyenda { display: flex; flex-wrap: wrap; gap: 16px; margin: 12px 0 0; font-size: .85rem; color: var(--texto-suave); }
+.arbol-leyenda span { display: inline-flex; align-items: center; gap: 6px; }
+.arbol-leyenda i { display: inline-block; width: 22px; height: 14px; border-radius: 4px; border: 1.5px solid; }
+.ley-regla  { background: #e0e7ff; border-color: #1e3a8a !important; border-radius: 8px !important; }
+.ley-token  { background: #dcfce7; border-color: #15803d !important; }
+.ley-lexico { background: #fef3c7; border-color: #b45309 !important; }
+.ley-error  { background: #fee2e2; border-color: #b91c1c !important; border-style: dashed !important; }
+.ley-vacio  { background: #f1f5f9; border-color: #94a3b8 !important; border-style: dashed !important; }

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RoboScript - Analizador</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<header th:replace="~{fragments :: encabezado}"></header>
+
+<main class="contenedor">
+    <h1>Analizar programa RoboScript</h1>
+    <p class="subtitulo">Cargue un archivo <code>.robot</code> o escriba el código directamente.</p>
+
+    <div class="alerta alerta-error" th:if="${error}" th:text="${error}"></div>
+
+    <form th:action="@{/analizar}" method="post" enctype="multipart/form-data" class="tarjeta">
+
+        <label class="campo-archivo">
+            <span>Archivo .robot</span>
+            <input type="file" name="archivo" id="archivo" accept=".robot,.txt">
+        </label>
+        <p class="archivo-cargado" id="cargado"></p>
+
+        <div class="separador"><span>o escriba el código</span></div>
+
+        <input type="hidden" name="nombre" id="nombre">
+        <textarea name="codigo" id="codigo" rows="16" spellcheck="false"
+                  placeholder="ROBOT 123ROB&#10;INICIO X10,Y05&#10;AVANZAR 5&#10;GIRAR DERECHA"></textarea>
+
+        <div class="acciones">
+            <button type="submit" class="boton">Analizar</button>
+            <button type="button" class="boton boton-secundario" id="limpiar">Limpiar</button>
+        </div>
+    </form>
+</main>
+
+<footer th:replace="~{fragments :: pie}"></footer>
+
+<script>
+    // Al elegir un archivo, se muestra su contenido en el cuadro de texto
+    const archivo = document.getElementById('archivo');
+    const codigo = document.getElementById('codigo');
+    const nombre = document.getElementById('nombre');
+    const cargado = document.getElementById('cargado');
+
+    archivo.addEventListener('change', () => {
+        const f = archivo.files[0];
+        if (!f) return;
+        const lector = new FileReader();
+        lector.onload = e => {
+            codigo.value = e.target.result;
+            nombre.value = f.name;
+            cargado.textContent = 'Archivo cargado: ' + f.name + ' (puede editar el código antes de analizar)';
+            archivo.value = '';   // se envía el texto del cuadro, así se respetan las ediciones
+        };
+        lector.readAsText(f, 'UTF-8');
+    });
+
+    document.getElementById('limpiar').addEventListener('click', () => {
+        archivo.value = '';
+        codigo.value = '';
+        nombre.value = '';
+        cargado.textContent = '';
+    });
+</script>
+</body>
+</html>

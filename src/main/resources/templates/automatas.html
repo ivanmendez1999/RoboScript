@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RoboScript - Autómatas</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" th:href="@{/css/teoria.css}">
+</head>
+<body>
+<header th:replace="~{fragments :: encabezado}"></header>
+
+<main class="contenedor">
+    <h1>Autómatas finitos de los tokens</h1>
+    <p class="subtitulo">Cada token definido por expresión regular se puede reconocer con un Autómata Finito Determinista (AFD).</p>
+
+    <!-- Selector de token -->
+    <nav class="pestanas">
+        <a th:each="a : ${automatas}"
+           th:href="@{/automatas/{id}(id=${a.id})}"
+           th:text="${a.token}"
+           th:classappend="${a.id == automata.id} ? 'activa'">CODIGO_ROBOT</a>
+    </nav>
+
+    <!-- Encabezado del token -->
+    <section class="tarjeta">
+        <div class="token-encabezado">
+            <div>
+                <h2 class="token-nombre" th:text="${automata.token}">CODIGO_ROBOT</h2>
+                <p class="token-desc" th:text="${automata.descripcion}">Descripción</p>
+            </div>
+            <div class="er">
+                <span class="er-titulo">Expresión regular</span>
+                <code th:text="${automata.expresionRegular}">[0-9]{3}[A-Z]{3}</code>
+            </div>
+        </div>
+
+        <!-- Dibujo del autómata -->
+        <div class="lienzo">
+            <svg id="diagrama" role="img" th:attr="aria-label='Diagrama del AFD de ' + ${automata.token}"></svg>
+        </div>
+        <p class="leyenda">
+            <span class="leyenda-item"><svg width="26" height="26"><circle cx="13" cy="13" r="10" class="ley-circulo"/></svg> Estado</span>
+            <span class="leyenda-item"><svg width="26" height="26"><circle cx="13" cy="13" r="10" class="ley-circulo"/><circle cx="13" cy="13" r="6.5" class="ley-circulo"/></svg> Estado de aceptación</span>
+            <span class="leyenda-item">→ inicio: estado inicial (q0)</span>
+            <span class="leyenda-item">Si no hay flecha para un símbolo, la cadena se rechaza.</span>
+        </p>
+
+        <!-- Controles de la animación -->
+        <div class="controles" th:if="${simulacion}">
+            <div class="cinta" id="cinta">
+                <span class="cinta-titulo">Cadena:</span>
+                <th:block th:if="${simulacion.cadena().length() > 0}">
+                    <span class="celda" th:each="i : ${#numbers.sequence(0, simulacion.cadena().length() - 1)}"
+                          th:text="${simulacion.cadena().charAt(i)}">1</span>
+                </th:block>
+                <span class="celda vacia" th:if="${simulacion.cadena().length() == 0}">ε (vacía)</span>
+            </div>
+            <div class="botones">
+                <button type="button" class="boton boton-secundario" id="btn-inicio" title="Inicio">⏮</button>
+                <button type="button" class="boton boton-secundario" id="btn-atras" title="Paso anterior">◀</button>
+                <button type="button" class="boton boton-secundario" id="btn-adelante" title="Paso siguiente">▶</button>
+                <button type="button" class="boton boton-secundario" id="btn-fin" title="Final">⏭</button>
+                <button type="button" class="boton" id="btn-play">▶▶ Reproducir</button>
+            </div>
+            <p class="paso-info" id="paso-info"></p>
+        </div>
+    </section>
+
+    <div class="dos-columnas">
+        <!-- Simulador -->
+        <section class="tarjeta">
+            <h2>Probar una cadena</h2>
+            <form th:action="@{/automatas/{id}(id=${automata.id})}" method="get" class="form-cadena">
+                <input type="text" name="cadena" th:value="${simulacion != null} ? ${simulacion.cadena()} : ''"
+                       placeholder="Ejemplo: 123ROB" autocomplete="off" spellcheck="false">
+                <button type="submit" class="boton">Simular</button>
+            </form>
+
+            <p class="ejemplos-titulo">Ejemplos que acepta:</p>
+            <div class="chips">
+                <a th:each="e : ${automata.ejemplosValidos}" class="chip chip-ok"
+                   th:href="@{/automatas/{id}(id=${automata.id}, cadena=${e})}" th:text="${e}">123ROB</a>
+            </div>
+            <p class="ejemplos-titulo">Ejemplos que rechaza:</p>
+            <div class="chips">
+                <a th:each="e : ${automata.ejemplosInvalidos}" class="chip chip-error"
+                   th:href="@{/automatas/{id}(id=${automata.id}, cadena=${e})}" th:text="${e}">12ROB</a>
+            </div>
+
+            <div th:if="${simulacion}">
+                <div th:class="${simulacion.aceptada()} ? 'alerta alerta-ok' : 'alerta alerta-error'"
+                     th:text="${simulacion.mensaje()}">Resultado</div>
+
+                <table class="tabla" id="tabla-pasos" th:unless="${#lists.isEmpty(simulacion.pasos())}">
+                    <thead><tr><th>Paso</th><th>Estado actual</th><th>Lee</th><th>Pasa a</th></tr></thead>
+                    <tbody>
+                    <tr th:each="p : ${simulacion.pasos()}">
+                        <td th:text="${p.numero()}">1</td>
+                        <td th:text="${p.estadoActual()}">q0</td>
+                        <td><code>'<span th:text="${p.simbolo()}">1</span>'</code></td>
+                        <td th:text="${p.valido()} ? ${p.estadoSiguiente()} : '✗ sin transición'">q1</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Tabla de transiciones -->
+        <section class="tarjeta">
+            <h2>Tabla de transiciones (δ)</h2>
+            <div class="tabla-scroll">
+                <table class="tabla tabla-delta">
+                    <thead>
+                    <tr>
+                        <th>Estado</th>
+                        <th th:each="c : ${automata.columnas}" th:text="${c}">0-9</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="e, i : ${automata.estados}">
+                        <td class="celda-estado">
+                            <span th:if="${e.inicial()}" title="Estado inicial">→</span>
+                            <span th:text="${e.nombre()}">q0</span>
+                            <span th:if="${e.aceptacion()}" title="Estado de aceptación">*</span>
+                        </td>
+                        <td th:each="d : ${automata.filas[i.index]}" th:text="${d}"
+                            th:classappend="${d == '—'} ? 'sin-transicion'">q1</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="nota">→ estado inicial &nbsp;·&nbsp; * estado de aceptación &nbsp;·&nbsp; — sin transición (rechazo)</p>
+
+            <h2 class="mt">Definición formal</h2>
+            <p class="formal" th:text="${automata.definicionFormal}">M = (Q, Σ, δ, q0, F)</p>
+        </section>
+    </div>
+</main>
+
+<footer th:replace="~{fragments :: pie}"></footer>
+
+<script th:inline="javascript">
+    window.AUTOMATA = /*[(${automataJson})]*/ null;
+    window.SIMULACION = /*[(${simulacionJson} ?: 'null')]*/ null;
+</script>
+<script th:src="@{/js/automata.js}"></script>
+</body>
+</html>

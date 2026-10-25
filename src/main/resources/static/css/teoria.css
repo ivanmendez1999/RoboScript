@@ -1,0 +1,106 @@
+/* =========================================================
+   Estilos de las páginas de teoría (autómatas y gramática)
+   ========================================================= */
+
+.mt { margin-top: 18px; }
+.nota { color: var(--texto-suave); font-size: .85rem; margin: 6px 0 12px; }
+.alerta-aviso { background: var(--aviso-claro); color: var(--aviso); }
+
+/* ---------- Pestañas de tokens ---------- */
+.pestanas { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.pestanas a {
+    padding: 7px 14px; border-radius: 999px; border: 1px solid var(--borde);
+    background: var(--tarjeta); color: var(--texto); text-decoration: none;
+    font-family: var(--mono); font-size: .85rem;
+}
+.pestanas a:hover { border-color: var(--primario); }
+.pestanas a.activa { background: var(--primario); border-color: var(--primario); color: #fff; }
+
+/* ---------- Encabezado del token ---------- */
+.token-encabezado { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; align-items: flex-start; }
+.token-nombre { font-family: var(--mono); font-size: 1.35rem; margin: 0; }
+.token-desc { margin: 4px 0 0; color: var(--texto-suave); }
+.er { background: var(--primario-claro); border-radius: 10px; padding: 10px 16px; }
+.er-titulo { display: block; font-size: .75rem; color: var(--primario); text-transform: uppercase; letter-spacing: .05em; }
+.er code { font-size: 1.15rem; font-weight: 700; color: var(--primario); }
+
+/* ---------- Lienzo SVG ---------- */
+.lienzo { margin-top: 16px; border: 1px dashed var(--borde); border-radius: 10px; background: #fbfcfe; overflow-x: auto; }
+#diagrama { display: block; width: 100%; height: auto; margin: 0 auto; }
+
+#diagrama .circulo { fill: #fff; stroke: var(--primario); stroke-width: 2; transition: fill .25s; }
+#diagrama .circulo-interno { fill: none; stroke: var(--primario); stroke-width: 1.5; }
+#diagrama .nombre-estado { font-family: var(--mono); font-size: 14px; font-weight: 700; fill: var(--texto); }
+#diagrama .arista { fill: none; stroke: #475569; stroke-width: 1.6; transition: stroke .25s; }
+#diagrama .punta-normal { fill: #475569; }
+#diagrama .punta-activa { fill: #f59e0b; }
+#diagrama .etiqueta-arista text { font-family: var(--mono); font-size: 12px; fill: #1e293b; }
+#diagrama .etiqueta-arista rect { fill: #fff; stroke: var(--borde); }
+#diagrama .texto-inicio { font-size: 11px; fill: var(--texto-suave); }
+
+/* Estados durante la animación */
+#diagrama .estado.actual .circulo { fill: #fde68a; stroke: #d97706; stroke-width: 3; }
+#diagrama .estado.ok .circulo { fill: #bbf7d0; stroke: var(--ok); stroke-width: 3; }
+#diagrama .estado.error .circulo { fill: #fecaca; stroke: var(--error); stroke-width: 3; }
+#diagrama .arista.activa { stroke: #f59e0b; stroke-width: 3.5; }
+#diagrama .etiqueta-arista.activa rect { fill: #fef3c7; stroke: #f59e0b; }
+
+.leyenda { display: flex; flex-wrap: wrap; gap: 18px; color: var(--texto-suave); font-size: .85rem; margin: 10px 0 0; }
+.leyenda-item { display: inline-flex; align-items: center; gap: 6px; }
+.ley-circulo { fill: #fff; stroke: var(--primario); stroke-width: 1.5; }
+
+/* ---------- Controles y cinta ---------- */
+.controles { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--borde); }
+.cinta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-bottom: 12px; }
+.cinta-titulo { margin-right: 8px; color: var(--texto-suave); }
+.celda {
+    min-width: 34px; height: 38px; display: inline-flex; align-items: center; justify-content: center;
+    border: 2px solid var(--borde); border-radius: 6px; font-family: var(--mono); font-size: 1.05rem;
+    background: #fff; transition: all .2s;
+}
+.celda.vacia { padding: 0 10px; color: var(--texto-suave); }
+.celda.leida { background: #e2e8f0; color: var(--texto-suave); }
+.celda.actual { background: #fde68a; border-color: #d97706; transform: translateY(-3px); }
+.celda.fallo { background: #fecaca; border-color: var(--error); }
+.botones { display: flex; flex-wrap: wrap; gap: 6px; }
+.botones .boton { padding: 8px 14px; }
+.paso-info { margin: 12px 0 0; font-family: var(--mono); font-size: .92rem; min-height: 1.4em; }
+
+/* ---------- Simulador ---------- */
+.form-cadena { display: flex; gap: 8px; }
+.form-cadena input {
+    flex: 1; padding: 10px 12px; border: 1px solid var(--borde); border-radius: 8px;
+    font-family: var(--mono); font-size: 1rem;
+}
+.ejemplos-titulo { margin: 14px 0 6px; font-size: .85rem; color: var(--texto-suave); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+    padding: 3px 10px; border-radius: 999px; font-family: var(--mono); font-size: .85rem;
+    text-decoration: none; background: #f1f5f9; color: var(--texto); border: 1px solid var(--borde);
+}
+.chip-ok { background: var(--ok-claro); color: var(--ok); border-color: #86efac; }
+.chip-error { background: var(--error-claro); color: var(--error); border-color: #fca5a5; }
+#tabla-pasos { margin-top: 12px; }
+#tabla-pasos tr.resaltada td { background: #fef3c7; }
+
+/* ---------- Tabla de transiciones ---------- */
+.tabla-delta td, .tabla-delta th { text-align: center; font-family: var(--mono); }
+.tabla-delta .celda-estado { font-weight: 700; text-align: left; white-space: nowrap; }
+.tabla-delta .sin-transicion { color: #cbd5e1; }
+.formal { font-family: var(--mono); font-size: .88rem; background: #f8fafc; border: 1px solid var(--borde); border-radius: 8px; padding: 12px; margin: 0; }
+
+/* ---------- Gramática ---------- */
+.bnf td { border-bottom: none; padding: 4px 6px; vertical-align: top; font-family: var(--mono); font-size: .88rem; }
+.bnf-izq { font-weight: 700; color: var(--primario); white-space: nowrap; text-align: right; }
+.bnf-op { color: var(--texto-suave); }
+
+.tabla-ll1-scroll { max-height: none; }
+.tabla-ll1 { font-size: .8rem; }
+.tabla-ll1 th, .tabla-ll1 td { text-align: center; padding: 6px 4px; border: 1px solid var(--borde); }
+.tabla-ll1 thead th { vertical-align: bottom; height: 120px; }
+.tabla-ll1 .vertical { writing-mode: vertical-rl; transform: rotate(180deg); font-family: var(--mono); white-space: nowrap; }
+.tabla-ll1 .fija { position: sticky; left: 0; background: var(--primario-claro); color: var(--primario); text-align: right; font-family: var(--mono); z-index: 1; }
+.tabla-ll1 td.con-prod { background: #eef2ff; font-weight: 700; color: var(--primario); cursor: help; }
+
+.tabla-traza td { font-size: .85rem; }
+.tabla-traza tr.fila-error td { background: var(--error-claro); color: var(--error); font-weight: 600; }

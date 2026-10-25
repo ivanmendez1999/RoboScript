@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RoboScript - Historial</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<header th:replace="~{fragments :: encabezado}"></header>
+
+<main class="contenedor">
+    <h1>Historial de análisis</h1>
+
+    <div class="alerta alerta-ok" th:if="${mensaje}" th:text="${mensaje}"></div>
+    <div class="alerta alerta-error" th:if="${error}" th:text="${error}"></div>
+
+    <div class="tarjeta" th:if="${#lists.isEmpty(historial)}">
+        <p>Todavía no se ha analizado ningún archivo.</p>
+        <a th:href="@{/}" class="boton">Analizar un archivo</a>
+    </div>
+
+    <section class="tarjeta" th:unless="${#lists.isEmpty(historial)}">
+        <div class="tabla-scroll">
+            <table class="tabla">
+                <thead>
+                <tr>
+                    <th>#</th><th>Archivo</th><th>Fecha</th><th>Resultado</th>
+                    <th>Tokens</th><th>Err. léxicos</th><th>Err. sintácticos</th><th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="h : ${historial}">
+                    <td th:text="${h.id}">1</td>
+                    <td th:text="${h.nombreArchivo}">recorrido.robot</td>
+                    <td th:text="${#temporals.format(h.fechaAnalisis, 'dd/MM/yyyy HH:mm')}">21/10/2026 22:00</td>
+                    <td>
+                        <span th:if="${h.valido}" class="etiqueta etiqueta-ok">VÁLIDO</span>
+                        <span th:unless="${h.valido}" class="etiqueta etiqueta-sintactico">NO VÁLIDO</span>
+                    </td>
+                    <td th:text="${h.tokensReconocidos}">32</td>
+                    <td th:text="${h.erroresLexicos}">0</td>
+                    <td th:text="${h.erroresSintacticos}">0</td>
+                    <td class="celda-acciones">
+                        <a th:href="@{/historial/{id}(id=${h.id})}" class="enlace">Ver</a>
+                        <form th:action="@{/historial/{id}/eliminar(id=${h.id})}" method="post"
+                              onsubmit="return confirm('¿Eliminar este análisis del historial?');">
+                            <button type="submit" class="enlace enlace-peligro">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{fragments :: pie}"></footer>
+</body>
+</html>

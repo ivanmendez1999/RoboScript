@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Encabezado común: se inserta en todas las páginas con th:replace -->
+<header th:fragment="encabezado" class="encabezado">
+    <div class="contenedor encabezado-interno">
+        <a th:href="@{/}" class="marca">
+            <span>RoboScript <small>Analizador léxico y sintáctico</small></span>
+        </a>
+        <nav class="menu">
+            <a th:href="@{/}">Nuevo análisis</a>
+            <a th:href="@{/historial}">Historial</a>
+            <a th:href="@{/automatas}">Autómatas</a>
+            <a th:href="@{/gramatica}">Gramática LL(1)</a>
+        </nav>
+    </div>
+</header>
+
+<!-- Pie de página común -->
+<footer th:fragment="pie" class="pie">
+    <div class="contenedor">
+        Universidad Mariano Gálvez de Guatemala · Autómatas y Lenguajes Formales · Proyecto RoboScript
+    </div>
+</footer>
+
+<!-- Código fuente con números de línea; resalta las líneas con error -->
+<div th:fragment="codigo" class="codigo">
+    <div th:each="linea, i : ${lineas}"
+         th:class="${lineasConError.contains(i.count)} ? 'codigo-linea con-error' : 'codigo-linea'">
+        <span class="codigo-num" th:text="${i.count}">1</span>
+        <span class="codigo-texto" th:text="${linea}">ROBOT 123ROB</span>
+    </div>
+</div>
+
+</body>
+</html>
